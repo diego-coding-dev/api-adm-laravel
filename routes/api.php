@@ -47,7 +47,7 @@ Route::prefix('private')->middleware(['auth:sanctum'])->group(function () {
             Route::get('list', 'list');
             Route::post('create', 'create');
             Route::get('show/{id}', 'show');
-            Route::put('finish/{id}', 'finish');
+            Route::put('finish/{id}', 'finish')->middleware(['hasItemInCart']);
             Route::delete('cancel/{id}', 'cancel');
         });
     });
@@ -60,7 +60,7 @@ Route::prefix('private')->middleware(['auth:sanctum'])->group(function () {
             Route::post('create', 'create');
             Route::get('show/{id}', 'show');
             Route::put('update/{id}', 'update');
-            Route::delete('delete/{id}', 'delete');
+            Route::delete('delete/{id}', 'delete')->middleware(['hasProduct']);
         });
     });
     /**
@@ -73,7 +73,7 @@ Route::prefix('private')->middleware(['auth:sanctum'])->group(function () {
             Route::get('show/{id}', 'show');
             Route::put('update/{id}', 'update');
             Route::post('update-image/{id}', 'updateImage');
-            Route::delete('delete/{id}', 'delete');
+            Route::delete('delete/{id}', 'delete')->middleware(['inStock']);
         });
     });
     /**
@@ -92,9 +92,9 @@ Route::prefix('private')->middleware(['auth:sanctum'])->group(function () {
     Route::prefix('order-items')->middleware(['ability:list-product,create-product,show-product,update-product'])->group(function () {
         Route::controller(\App\Http\Controllers\Api\Storage\OrderItemController::class)->group(function () {
             Route::get('list/{order_id}', 'list');
-            Route::post('add/{order_id}', 'add');
+            Route::post('add/{order_id}', 'add')->middleware(['beforeAddOrderItem']);
             Route::get('show/{id}', 'show');
-            Route::put('add-quantity/{id}', 'addQuantity');
+            Route::put('add-quantity/{id}', 'addQuantity')->middleware(['hasEnoughQuantity']);
             Route::put('remove-quantity/{id}', 'removeQuantity');
             Route::delete('remove/{id}', 'remove');
         });

@@ -21,10 +21,10 @@ class OrderItemController extends Controller
     public function list(string $orderId): object
     {
         return response()->json([
-            'data' => [
-                'order_items' => DB::table('order_items_view')->where('order_id', $orderId)->paginate(10)
-            ]
-        ], 200);
+                    'data' => [
+                        'order_items' => DB::table('order_items_view')->where('order_id', $orderId)->paginate(10)
+                    ]
+                        ], 200);
     }
 
     /**
@@ -62,18 +62,18 @@ class OrderItemController extends Controller
             DB::rollBack();
 
             return response()->json([
-                'data' => [],
-                'message' => 'operação indisponível!'
-            ], 503);
+                        'data' => [],
+                        'message' => 'operação indisponível!'
+                            ], 503);
             //throw $th;
         }
 
         return response()->json([
-            'data' => [
-                'order_item' => DB::table('order_items_view')->where('order_id', $orderId)->paginate(10)
-            ],
-            'message' => 'item adicionado!',
-        ], 200);
+                    'data' => [
+                        'order_item' => DB::table('order_items_view')->where('order_id', $orderId)->paginate(10)
+                    ],
+                    'message' => 'item adicionado!',
+                        ], 200);
     }
 
     /**
@@ -86,14 +86,14 @@ class OrderItemController extends Controller
     {
         if (!$orderItem = DB::table('order_items_view')->where('id', $orderItemId)->get()) {
             return response()->json([
-                'data' => [],
-                'message' => 'operação indisponível!'
-            ], 503);
+                        'data' => [],
+                        'message' => 'operação indisponível!'
+                            ], 503);
         }
 
         return response()->json([
-            'data' => ['order_item' => $orderItem]
-        ], 200);
+                    'data' => ['order_item' => $orderItem]
+                        ], 200);
     }
 
     /**
@@ -130,15 +130,15 @@ class OrderItemController extends Controller
             DB::rollback();
 
             return response()->json([
-                'data' => [],
-                'message' => 'operação indisponível!'
-            ], 503);
+                        'data' => [],
+                        'message' => 'operação indisponível!'
+                            ], 503);
         }
 
         return response()->json([
-            'data' => ['order_item' => $orderItem],
-            'message' => 'item atualizado!'
-        ], 200);
+                    'data' => ['order_item' => $orderItem],
+                    'message' => 'item atualizado!'
+                        ], 200);
     }
 
     /**
@@ -175,15 +175,15 @@ class OrderItemController extends Controller
             DB::rollback();
 
             return response()->json([
-                'data' => [],
-                'message' => 'operação indisponível!'
-            ], 503);
+                        'data' => [],
+                        'message' => 'operação indisponível!'
+                            ], 503);
         }
 
         return response()->json([
-            'data' => ['order_item' => $orderItem],
-            'message' => 'item atualizado!'
-        ], 200);
+                    'data' => ['order_item' => $orderItem],
+                    'message' => 'item atualizado!'
+                        ], 200);
     }
 
     /**
@@ -213,15 +213,15 @@ class OrderItemController extends Controller
             DB::rollback();
 
             return response()->json([
-                'data' => [],
-                'message' => 'operação indisponível!'
-            ], 503);
+                        'data' => [],
+                        'message' => 'operação indisponível!'
+                            ], 503);
         }
 
         return response()->json([
-            'data' => [],
-            'message' => 'item deletedo!'
-        ], 200);
+                    'data' => [],
+                    'message' => 'item deletedo!'
+                        ], 200);
     }
 
 }

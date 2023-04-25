@@ -24,6 +24,7 @@ class OrderItem extends Model
         'storage_id',
         'order_id',
         'quantity',
+        'total_price',
         'is_finish'
     ];
 }

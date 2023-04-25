@@ -16,6 +16,7 @@ return new class extends Migration {
             $table->unsignedBigInteger('storage_id');
             $table->unsignedBigInteger('order_id');
             $table->integer('quantity', false, true);
+            $table->decimal('total_price', 8, 2, true)->nullable();
             $table->boolean('is_finished')->default(false);
             $table->timestamps();
             $table->softDeletes();
