@@ -65,6 +65,12 @@ class Kernel extends HttpKernel
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'abilities' => \Laravel\Sanctum\Http\Middleware\CheckAbilities::class,
         'ability' => \Laravel\Sanctum\Http\Middleware\CheckForAnyAbility::class,
+        //--------------------------- adicionados ----------------------------------//
+        'hasProduct' => \App\Http\Middleware\HasProduct::class,
+        'inStock' => \App\Http\Middleware\InStock::class,
+        'hasItemInCart' => \App\Http\Middleware\HasItemInCart::class,
+        'hasEnoughQuantity' => \App\Http\Middleware\HasEnoughQuantity::class,
+        'beforeAddOrderItem' => \App\Http\Middleware\BeforeAddOrderItem::class,        
     ];
 
 }
