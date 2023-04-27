@@ -34,4 +34,14 @@ class Ability extends Model
         return $this->hasMany(\App\Models\EmployeeAbility::class, 'ability_id', 'id');
     }
 
+    /**
+     * Relacionamento entre ABILITIES e TYPE_USER_ABILITIES
+     * 
+     * @return object
+     */
+    public function typeUserAbilities(): object
+    {
+        return $this->hasMany($this->typeUserAbilities::class, 'ability_id', 'id');
+    }
+
 }

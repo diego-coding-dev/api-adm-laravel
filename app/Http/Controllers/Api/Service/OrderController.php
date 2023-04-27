@@ -8,10 +8,12 @@ use App\Models\OrderItem;
 use App\Models\Storage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use function response;
+use \App\Traits\HasResponseApi;
 
 class OrderController extends Controller
 {
+
+    use HasResponseApi;
 
     /**
      * Exibe todos os pedidos realizados
@@ -20,11 +22,11 @@ class OrderController extends Controller
      */
     public function list(): object
     {
-        return response()->json([
-            'data' => [
-                'order_list' => Order::where('is_canceled', false)->paginate(10)
-            ]
-        ], 200);
+        $response['data'] = [
+            'order_list' => Order::where('is_canceled', false)->paginate(10)
+        ];
+
+        return $this->makeResponse($response, 200, 'found');
     }
 
     /**
@@ -41,29 +43,30 @@ class OrderController extends Controller
         $orderData['register'] = bin2hex(random_bytes(5));
 
         if (!$order = Order::create($orderData)) {
-            return response()->json([
-                'data' => [],
-                'message' => 'operação indisponível!'
-            ], 503);
+            $response['data'] = [];
+            return $this->makeResponse($data, 500, 'not_created');
         }
 
-        return response()->json([
-            'data' => [
-                'order' => $order
-            ],
-            'message' => 'pedido registrado!',
-        ], 200);
+        $response['data'] = [
+            'order' => $order
+        ];
+
+        return $this->makeResponse($response, 201, 'created');
     }
 
     public function show(string $orderId)
     {
-        return response()->json([
-            'data' => [
-                'order' => Order::find($orderId),
-                'items_quantity' => DB::table('order_items')->select(DB::raw('count(id) as items_quantity'))->where('order_id', $orderId)->get()
-            ],
-            'message' => 'encontrado'
-        ], 200);
+        if (!$order = Order::find($orderId)) {
+            $response['data'] = [];
+            return $this->makeResponse($data, 404, 'not_found');
+        }
+
+        $response['data'] = [
+            'order' => Order::find($orderId),
+            'items_quantity' => DB::table('order_items')->select(DB::raw('count(id) as items_quantity'))->where('order_id', $orderId)->get()
+        ];
+
+        return $this->makeResponse($response, 200, 'found');
     }
 
     public function finish(string $orderId)
@@ -86,16 +89,12 @@ class OrderController extends Controller
         } catch (\Throwable $th) {
             DB::rollBack();
 
-            return response()->json([
-                'data' => [],
-                'message' => 'operação indisponível!'
-            ], 503);
+            $response['data'] = [];
+            return $this->makeResponse($response, 500, 'error');
         }
 
-        return response()->json([
-            'data' => [],
-            'message' => 'pedido processado!'
-        ], 200);
+        $response['data'] = [];
+        return $this->makeResponse($response, 200, 'finished');
     }
 
     /**
@@ -128,16 +127,12 @@ class OrderController extends Controller
         } catch (\Exception $exc) {
             DB::rollBack();
 
-            return response()->json([
-                'data' => [],
-                'message' => 'operação indisponível!'
-            ], 503);
+            $response['data'] = [];
+            return $this->makeResponse($response, 500, 'error');
         }
 
-        return response()->json([
-            'data' => [],
-            'message' => 'pedido cancelado!'
-        ], 200);
+        $response['data'] = [];
+        return $this->makeResponse($response, 200, 'canceled');
     }
 
 }

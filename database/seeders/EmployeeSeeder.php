@@ -18,7 +18,7 @@ class EmployeeSeeder extends Seeder
             'type_user_id' => 1,
             'name' => 'funcionario 1',
             'email' => 'funcionario_1@mail.com',
-            'password' => bcrypt('123456'),
+            'password' => '123456',
             'is_active' => true
         ];
 

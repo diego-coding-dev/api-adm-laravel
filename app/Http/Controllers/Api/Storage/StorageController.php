@@ -6,9 +6,13 @@ use App\Http\Controllers\Controller;
 use App\Models\Storage;
 use DB;
 use Illuminate\Http\Request;
+use \App\Traits\HasResponseApi;
 
 class StorageController extends Controller
 {
+
+    use HasResponseApi;
+
     /**
      * Retorna os produtos que estão no estoque
      * 
@@ -16,11 +20,11 @@ class StorageController extends Controller
      */
     public function list(): object
     {
-        return response()->json([
-            'data' => [
-                'product_list' => DB::table('storages_view')->paginate(10)
-            ]
-        ], 200);
+        $response['data'] = [
+            'product_list' => DB::table('storages_view')->paginate(10)
+        ];
+
+        return $this->makeResponse($response, 200, 'found');
     }
 
     /**
@@ -32,18 +36,16 @@ class StorageController extends Controller
     public function show(string $storageId): object
     {
         if (!$storage = DB::table('storages_view')->where('deleted_at', null)->find($storageId)) {
-            return response()->json([
-                'data' => [],
-                'message' => 'Produto não encontrado no estoque!'
-            ], 200);
+            $response['data'] = [];
+
+            return $this->makeResponse($response, 404, 'not_found');
         }
 
-        return response()->json([
-            'data' => [
-                'storage' => $storage
-            ],
-            'message' => 'encontrado!'
-        ], 200);
+        $response['data'] = [
+            'storage' => $storage
+        ];
+
+        return $this->makeResponse($response, 200, found);
     }
 
     /**
@@ -60,10 +62,9 @@ class StorageController extends Controller
         $storageData = $request->only('quantity', 'price');
 
         if (!$storage = Storage::find($storageId)) {
-            return response()->json([
-                'data' => [],
-                'message' => 'Produto não encontrado no estoque!'
-            ], 200);
+            $response['data'] = [];
+
+            return $this->makeResponse($response, 404, 'not_found');
         }
 
         if (array_key_exists('quantity', $storageData)) {
@@ -71,17 +72,16 @@ class StorageController extends Controller
         }
 
         if (!Storage::where('id', $storageId)->update($storageData)) {
-            return response()->json([
-                'data' => [],
-                'message' => 'operação indisponível!'
-            ], 503);
+            $response['data'] = [];
+
+            return $this->makeResponse($response, 500, 'not_updated');
         }
 
-        return response()->json([
-            'data' => [
-                'product' => Storage::find($storageId)
-            ],
-            'message' => 'estoque atualizado!'
-        ], 200);
+        $response['data'] = [
+            'product' => Storage::find($storageId)
+        ];
+
+        return $this->makeResponse($response, 200, 'updated');
     }
+
 }

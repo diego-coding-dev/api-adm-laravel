@@ -8,9 +8,12 @@ use App\Models\OrderItem;
 use App\Models\Storage;
 use Illuminate\Http\Request;
 use DB;
+use \App\Traits\HasResponseApi;
 
 class OrderItemController extends Controller
 {
+
+    use HasResponseApi;
 
     /**
      * Exibe todos os itens do pedido
@@ -20,11 +23,11 @@ class OrderItemController extends Controller
      */
     public function list(string $orderId): object
     {
-        return response()->json([
-                    'data' => [
-                        'order_items' => DB::table('order_items_view')->where('order_id', $orderId)->paginate(10)
-                    ]
-                        ], 200);
+        $response['data'] = [
+            'order_items' => DB::table('order_items_view')->where('order_id', $orderId)->paginate(10)
+        ];
+
+        return $this->makeResponse($response, 200, 'found');
     }
 
     /**
@@ -61,19 +64,16 @@ class OrderItemController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
 
-            return response()->json([
-                        'data' => [],
-                        'message' => 'operação indisponível!'
-                            ], 503);
-            //throw $th;
+            $response['data'] = [];
+
+            return $this->makeResponse($response, 500, 'error');
         }
 
-        return response()->json([
-                    'data' => [
-                        'order_item' => DB::table('order_items_view')->where('order_id', $orderId)->paginate(10)
-                    ],
-                    'message' => 'item adicionado!',
-                        ], 200);
+        $response['data'] = [
+            'order_item' => DB::table('order_items_view')->where('order_id', $orderId)->paginate(10)
+        ];
+
+        return $this->makeResponse($response, 201, 'created');
     }
 
     /**
@@ -85,15 +85,16 @@ class OrderItemController extends Controller
     public function show(string $orderItemId): object
     {
         if (!$orderItem = DB::table('order_items_view')->where('id', $orderItemId)->get()) {
-            return response()->json([
-                        'data' => [],
-                        'message' => 'operação indisponível!'
-                            ], 503);
+            $response['data'] = [];
+
+            return $this->makeResponse($response, 404, 'not_found');
         }
 
-        return response()->json([
-                    'data' => ['order_item' => $orderItem]
-                        ], 200);
+        $response['data'] = [
+            'order_item' => $orderItem
+        ];
+
+        return $this->makeResponse($response, 200, 'found');
     }
 
     /**
@@ -129,16 +130,16 @@ class OrderItemController extends Controller
         } catch (\Exception $exc) {
             DB::rollback();
 
-            return response()->json([
-                        'data' => [],
-                        'message' => 'operação indisponível!'
-                            ], 503);
+            $response['data'] = [];
+
+            $this->makeResponse($response, 500, 'error');
         }
 
-        return response()->json([
-                    'data' => ['order_item' => $orderItem],
-                    'message' => 'item atualizado!'
-                        ], 200);
+        $response['data'] = [
+            'order_item' => $orderItem
+        ];
+
+        return $this->makeResponse($response, 200, 'added');
     }
 
     /**
@@ -174,16 +175,16 @@ class OrderItemController extends Controller
         } catch (\Exception $exc) {
             DB::rollback();
 
-            return response()->json([
-                        'data' => [],
-                        'message' => 'operação indisponível!'
-                            ], 503);
+            $response['data'] = [];
+
+            $this->makeResponse($response, 500, 'error');
         }
 
-        return response()->json([
-                    'data' => ['order_item' => $orderItem],
-                    'message' => 'item atualizado!'
-                        ], 200);
+        $response['data'] = [
+            'order_item' => $orderItem
+        ];
+
+        return $this->makeResponse($response, 200, 'removed');
     }
 
     /**
@@ -212,16 +213,14 @@ class OrderItemController extends Controller
         } catch (\Exception $exc) {
             DB::rollback();
 
-            return response()->json([
-                        'data' => [],
-                        'message' => 'operação indisponível!'
-                            ], 503);
+            $response['data'] = [];
+
+            return $this->makeResponse($response, 500, 'error');
         }
 
-        return response()->json([
-                    'data' => [],
-                    'message' => 'item deletedo!'
-                        ], 200);
+        $response['data'] = [];
+
+        return $this->makeResponse($response, 200, 'deleted');
     }
 
 }

@@ -11,16 +11,13 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::create('employees', function (Blueprint $table) {
+        Schema::create('type_user_abilities', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('type_user_id');
-            $table->string('name', 220);
-            $table->string('email', 150);
-            $table->string('password', 255)->nullable();
-            $table->boolean('is_active')->default(false);
+            $table->unsignedBigInteger('ability_id');
             $table->timestamps();
-            $table->softDeletes();
             $table->foreign('type_user_id')->references('id')->on('type_users')->cascadeOnUpdate();
+            $table->foreign('ability_id')->references('id')->on('abilities')->cascadeOnUpdate();
         });
     }
 
@@ -29,6 +26,6 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('employees');
+        Schema::dropIfExists('type_user_abilities');
     }
 };

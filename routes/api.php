@@ -20,13 +20,43 @@ use Illuminate\Support\Facades\Route;
 //});
 
 Route::prefix('public')->group(function () {
-    Route::post('authentication', [\App\Http\Controllers\Api\AuthenticationController::class, 'authentication']);
+    /**
+     * rota authentication
+     */
+    Route::prefix('authentication')->group(function () {
+        Route::controller(\App\Http\Controllers\Api\AuthenticationController::class)->group(function () {
+            Route::post('check-email', 'checkEmail');
+            Route::post('set-password', 'setPassword');
+            route::post('', 'makeAuthentication');
+        });
+    });
 });
 /**
  * rota private
  */
 Route::prefix('private')->middleware(['auth:sanctum'])->group(function () {
-    Route::post('logout', [\App\Http\Controllers\Api\AuthenticationController::class, 'logout']);
+    Route::delete('logout', [\App\Http\Controllers\Api\AuthenticationController::class, 'logout']);
+    /**
+     * rota profile
+     */
+    Route::prefix('profile')->group(function () {
+        Route::controller(\App\Http\Controllers\Api\ProfileController::class)->group(function () {
+            Route::get('show', 'show');
+            Route::put('update-email', 'updateEmail');
+            Route::put('update-password', 'updatePassword');
+        });
+    });
+    /**
+     * rota employees
+     */
+    Route::prefix('employees')->middleware(['ability:list-employee,create-employee,show-employee,update-employee'])->group(function () {
+        Route::controller(\App\Http\Controllers\Api\Rh\EmployeeController::class)->group(function () {
+            Route::get('list', 'list');
+            Route::post('create', 'create');
+            Route::put('deactive/{id}', 'deactive');
+            Route::put('active/{id}', 'active');
+        });
+    });
     /**
      * rota clients
      */
