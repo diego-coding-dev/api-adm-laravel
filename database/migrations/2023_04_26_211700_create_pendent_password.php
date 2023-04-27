@@ -11,10 +11,9 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::create('activation_tokens', function (Blueprint $table) {
-            $table->string('email', 150)->primary();
-            $table->string('token');
-            $table->timestamp('created_at')->nullable();
+        Schema::create('pendent_passwords', function (Blueprint $table) {
+            $table->string('email')->primary();
+            $table->timestamps();
         });
     }
 
@@ -23,6 +22,6 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('activation_tokens');
+        Schema::dropIfExists('pendent_passwords');
     }
 };

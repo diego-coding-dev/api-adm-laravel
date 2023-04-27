@@ -5,9 +5,12 @@ namespace App\Http\Controllers\Api\Rh;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Client;
+use \App\Traits\HasResponseApi;
 
 class ClientController extends Controller
 {
+
+    use HasResponseApi;
 
     /**
      * Retorna os clientes cadastrados
@@ -16,11 +19,11 @@ class ClientController extends Controller
      */
     public function list(): object
     {
-        return response()->json([
-                    'data' => [
-                        'client_list' => Client::paginate(10)
-                    ]
-                        ], 200);
+        $reponse['data'] = [
+            'clientList' => Client::paginate(10)
+        ];
+
+        return $this->makeResponse($reponse, 200, 'found');
     }
 
     /**
@@ -37,41 +40,39 @@ class ClientController extends Controller
         $clientData['type_user_id'] = 4;
 
         if (!$client = Client::create($clientData)) {
-            return response()->json([
-                        'data' => [],
-                        'message' => 'operação indisponível!'
-                            ], 503);
+            $response['data'] = [];
+
+            return $this->makeResponse($response, 500, 'not_created');
         }
 
-        return response()->json([
-                    'data' => [
-                        'client' => $client
-                    ],
-                    'message' => 'cliente registrado!',
-                        ], 200);
+        $response['data'] = [
+            'client_data' => $client
+        ];
+
+        return $this->makeResponse($response, 201, 'created');
     }
 
-   /**
-    * Exibe dados de um cliente
-    * 
-    * @param string $clientId
-    * @return object
-    */
+    /**
+     * Exibe dados de um cliente
+     * 
+     * @param string $clientId
+     * @return object
+     */
     public function show(string $clientId): object
     {
         if (!$client = Client::find($clientId)) {
-            return response()->json([
-                        'data' => [],
-                        'message' => 'client não encontrado!'
-                            ], 200);
+            $response['data'] = [
+                'client' => []
+            ];
+
+            return $this->makeResponse($response, 404, 'not_found');
         }
 
-        return response()->json([
-                    'data' => [
-                        'client' => $client
-                    ],
-                    'message' => 'encontrado!'
-                        ], 200);
+        $response['data'] = [
+            'client' => $client
+        ];
+
+        return $this->makeResponse($response, 200, 'found');
     }
 
     /**
@@ -88,18 +89,18 @@ class ClientController extends Controller
         $clientData = $request->only('email');
 
         if (!Client::where('id', $clientId)->update($clientData)) {
-            return response()->json([
-                        'data' => [],
-                        'message' => 'operação indisponível!'
-                            ], 503);
+            $response['data'] = [
+                'client' => []
+            ];
+
+            return $this->makeResponse($response, 500, 'not_updated');
         }
 
-        return response()->json([
-                    'data' => [
-                        'client_data' => Client::find($clientId)
-                    ],
-                    'message' => 'cliente atualizado!'
-                        ], 200);
+        $response['data'] = [
+            'client' => Client::find($clientId)
+        ];
+
+        return $this->makeResponse($response, 200, 'updated');
     }
 
     /**
@@ -111,16 +112,18 @@ class ClientController extends Controller
     public function delete(string $clientId): object
     {
         if (!Client::where('id', $clientId)->delete()) {
-            return response()->json([
-                        'data' => [],
-                        'message' => 'operação indisponível!'
-                            ], 503);
+            $response['data'] = [
+                'client' => []
+            ];
+
+            return $this->makeResponse($response, 500, 'error');
         }
 
-        return response()->json([
-                    'data' => [],
-                    'message' => 'cliente removido!'
-                        ], 200);
+        $response['data'] = [
+            'client' => []
+        ];
+
+        return $this->makeResponse($response, 200, 'deleted');
     }
 
 }

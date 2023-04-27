@@ -8,9 +8,12 @@ use App\Models\Storage as StorageModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use DB;
+use \App\Traits\HasResponseApi;
 
 class ProductController extends Controller
 {
+
+    use HasResponseApi;
 
     /**
      * Retorna os produtos cadastradas
@@ -19,11 +22,11 @@ class ProductController extends Controller
      */
     public function list(): object
     {
-        return response()->json([
-            'data' => [
-                'product_list' => Product::paginate(10)
-            ]
-        ], 200);
+        $response['data'] = [
+            'product_list' => Product::paginate(10)
+        ];
+
+        return $this->makeResponse($response, 200, 'found');
     }
 
     /**
@@ -51,19 +54,16 @@ class ProductController extends Controller
             DB::rollBack();
             Storage::disk('product')->delete($productData['image']);
 
-            return response()->json([
-                'data' => [],
-                'message' => 'operação indisponível!'
-            ], 503);
-            // classe transactionException
+            $response['data'] = [];
+
+            return $this->makeResponse($response, 500, 'error');
         }
 
-        return response()->json([
-            'data' => [
-                'product' => $product
-            ],
-            'message' => 'produto registrado!',
-        ], 200);
+        $response['data'] = [
+            'product' => $product
+        ];
+
+        return $this->makeResponse($response, 201, 'created');
     }
 
     /**
@@ -75,18 +75,16 @@ class ProductController extends Controller
     public function show(string $productId): object
     {
         if (!$product = Product::find($productId)) {
-            return response()->json([
-                'data' => [],
-                'message' => 'produto não encontrado!'
-            ], 200);
+            $response['data'] = [];
+
+            return $this->makeResponse($response, 404, 'not_found');
         }
 
-        return response()->json([
-            'data' => [
-                'product' => $product
-            ],
-            'message' => 'encontrado!'
-        ], 200);
+        $response['data'] = [
+            'product' => $product
+        ];
+
+        return $this->makeResponse($response, 200, 'found');
     }
 
     /**
@@ -107,20 +105,18 @@ class ProductController extends Controller
         if (!Product::where('id', $productId)->update(['image' => $newImage])) {
             Storage::disk('product')->delete($newImage);
 
-            return response()->json([
-                'data' => [],
-                'message' => 'operação indisponível!'
-            ], 503);
+            $response['data'] = [];
+
+            return $this->makeResponse($response, 500, 'error');
         }
 
         Storage::disk('product')->delete($product->image);
 
-        return response()->json([
-            'data' => [
-                'product' => Product::find($productId)
-            ],
-            'message' => 'imagem atualizada!'
-        ], 200);
+        $response['data'] = [
+            'product' => Product::find($productId)
+        ];
+
+        return $this->makeResponse($response, 200, 'updated');
     }
 
     /**
@@ -137,18 +133,16 @@ class ProductController extends Controller
         $produtData = $request->only('product');
 
         if (!Product::where('id', $productId)->update($produtData)) {
-            return response()->json([
-                'data' => [],
-                'message' => 'operação indisponível!'
-            ], 503);
+            $response['data'] = [];
+
+            return $this->makeResponse($response, 500, 'error');
         }
 
-        return response()->json([
-            'data' => [
-                'product' => Product::find($productId)
-            ],
-            'message' => 'produto atualizado!'
-        ], 200);
+        $response['data'] = [
+            'product' => Product::find($productId)
+        ];
+
+        return $this->makeResponse($response, 200, 'updated');
     }
 
     /**
@@ -169,16 +163,14 @@ class ProductController extends Controller
         } catch (\Throwable $th) {
             DB::rollBack();
 
-            return response()->json([
-                'data' => [],
-                'message' => 'operação indisponível!'
-            ], 503);
+            $response['data'] = [];
+
+            return $this->makeResponse($response, 500, 'error');
         }
 
-        return response()->json([
-            'data' => [],
-            'message' => 'produto removido!'
-        ], 200);
+        $response['data'] = [];
+
+        return $this->makeResponse($response, 200, 'deleted');
     }
 
 }

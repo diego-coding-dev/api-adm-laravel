@@ -5,9 +5,12 @@ namespace App\Http\Controllers\Api\Storage;
 use App\Http\Controllers\Controller;
 use App\Models\TypeProduct;
 use Illuminate\Http\Request;
+use \App\Traits\HasResponseApi;
 
 class TypeProductController extends Controller
 {
+
+    use HasResponseApi;
 
     /**
      * Retorna as categorias de produtos cadastradas
@@ -16,11 +19,11 @@ class TypeProductController extends Controller
      */
     public function list(): object
     {
-        return response()->json([
-                    'data' => [
-                        'type_product_list' => TypeProduct::paginate(10)
-                    ]
-                        ], 200);
+        $response['data'] = [
+            'type_product_list' => TypeProduct::paginate(10)
+        ];
+
+        return $this->makeResponse($response, 200, 'found');
     }
 
     /**
@@ -36,18 +39,16 @@ class TypeProductController extends Controller
         $typeProductData = $request->all();
 
         if (!$typeProduct = TypeProduct::create($typeProductData)) {
-            return response()->json([
-                        'data' => [],
-                        'message' => 'operação indisponível!'
-                            ], 503);
+            $response['data'] = [];
+
+            return $this->makeResponse($response, 500, 'not_created');
         }
 
-        return response()->json([
-                    'data' => [
-                        'type_product' => $typeProduct
-                    ],
-                    'message' => 'Categoria registrada!',
-                        ], 200);
+        $response['data'] = [
+            'type_product' => $typeProduct
+        ];
+
+        return $this->makeResponse($response, 201, 'created');
     }
 
     /**
@@ -59,18 +60,16 @@ class TypeProductController extends Controller
     public function show(string $typeProductId): object
     {
         if (!$typeProduct = TypeProduct::find($typeProductId)) {
-            return response()->json([
-                        'data' => [],
-                        'message' => 'Categoria não encontrada!'
-                            ], 200);
+            $response['data'] = [];
+
+            return $this->makeResponse($response, 404, 'not_found');
         }
 
-        return response()->json([
-                    'data' => [
-                        'type_product' => $typeProduct
-                    ],
-                    'message' => 'encontrada!'
-                        ], 200);
+        $response['data'] = [
+            'type_product' => $typeProduct
+        ];
+
+        return $this->makeResponse($response, 200, 'found');
     }
 
     /**
@@ -87,40 +86,35 @@ class TypeProductController extends Controller
         $typeProductData = $request->only('type_product');
 
         if (!TypeProduct::where('id', $typeProductId)->update($typeProductData)) {
-            return response()->json([
-                        'data' => [],
-                        'message' => 'operação indisponível!'
-                            ], 503);
+            $response['data'] = [];
+
+            return $this->makeResponse($response, 500, 'not_updated');
         }
 
-        return response()->json([
-                    'data' => [
-                        'type_product_data' => TypeProduct::find($typeProductId)
-                    ],
-                    'message' => 'categoria atualizado!'
-                        ], 200);
+        $response['data'] = [
+            'type_product_data' => TypeProduct::find($typeProductId)
+        ];
+
+        return $this->makeResponse($response, 200, 'updated');
     }
 
     /**
      * Remove um cliente
      * 
-     * @param Request $request
      * @param string $typeProductId
      * @return object
      */
-    public function delete(Request $request, string $typeProductId): object
+    public function delete(string $typeProductId): object
     {
         if (!TypeProduct::where('id', $typeProductId)->delete()) {
-            return response()->json([
-                        'data' => [],
-                        'message' => 'operação indisponível!'
-                            ], 503);
+            $response['data'] = [];
+
+            return $this->makeResponse($response, 500, 'error');
         }
 
-        return response()->json([
-                    'data' => [],
-                    'message' => 'categoria removida!'
-                        ], 200);
+        $response['data'] = [];
+
+        return $this->makeResponse($response, 200, 'deleted');
     }
 
 }
